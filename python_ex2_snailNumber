@@ -1,0 +1,79 @@
+[문제]
+이차원 리스트에 값을 입력하는 방법은 여러가지가 있다. 행 우선 입력 방법이나
+열 우선 입력 방법들을 일반적으로 생각할 수 있는데, 본 프로그램에서는 행과 열을
+가장 바깥쪽에서 안쪽으로 채워나가는 달팽이 모양으로 값을 입력하고자 합니다.
+예를들어
+3x3 인 구조는
+0  1  2
+7  8  3
+6  5  4
+
+5X5 인 구조는
+ 0  1  2  3  4
+15 16 17 18  5
+14 23 24 19  6
+13 22 21 20  7
+12 11 10  9  8
+과 같이 (0,0)부터 시작해서 바깥쪽부터 안쪽으로 값이 채워지는 리스트를 만들고자 합니다.
+
+<실행결과>
+Row와Column 입력 (예) 5 5 > 3 3
+  0  1  2
+  7  8  3
+  6  5  4
+
+'''
+
+
+from snailNumber_sub import snailNumber
+
+if __name__ == "__main__":
+   
+    r,c = map(int,input("Row와Column 입력 (예) 5 5 > ").split(' '))
+
+    #array는 입력받은 행과 열만큼 0로 초기화된 이차원 리스트
+    array = [[0 for x in range(c)] for x in range(r)]
+
+    row,col = r,c   # 나중에 array를 출력할때를 위해 r,c 백업
+
+    snailNumber(array, r, c)
+
+    for i in range(row):       # array 출력
+        for j in range(col):
+            print('{:3d}'.format(array[i][j]),end="")
+        print()
+        
+        
+        
+  def snailNumber(array, r, c):
+
+    lst = list()
+
+    cnt = 0         # 현재 출력할 수
+    curr_point = (0,0)  # 현재 수를 출력할 좌표
+    curr_direct = 'RIGHT'   # 현재 방향
+
+    # 방향을 넣으면 움직여야할 좌표를 반환하는 dictionary
+    # 이차원 리스트에서 움직일 수있는 방향은 상하좌우 4개의 방향
+    move = {'UP': (-1,0),'DOWN': (1,0),'LEFT': (0,-1),'RIGHT': (0,1)}
+
+    # 현재 방향을 넣으면 다음방향을 반환하는 dictionary
+    next_direct = {'UP': 'RIGHT','RIGHT': 'DOWN','DOWN': 'LEFT','LEFT': 'UP'}
+
+    # 방향이 바뀔때 마다 움직여야할 거리를 순서대로 list에 담음
+    for i in range(r+c-1):  
+        if i % 2 is 0:
+            lst.append(c)
+            r = r - 1            
+        else:
+            lst.append(r)
+            c = c - 1
+            
+           
+    for i in lst:     # array에 차례로 숫자를 씀
+        for j in range(i):
+            array[curr_point[0]][curr_point[1]] = cnt
+            cnt = cnt + 1
+            if j is i-1:
+                curr_direct = next_direct[curr_direct]        
+            curr_point = tuple(map(sum,zip(curr_point, move[curr_direct])))

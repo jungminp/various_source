@@ -1,0 +1,82 @@
+ * [문제] Log Parsing
+ * access.log 파일을 파싱하여 URL 호출 성공 횟수와 이미지 파일 호출 횟수를 세는
+   프로그램을 작성한다.
+ * <요구사항>
+ * 1. access.log 파일을 읽어 들여 문자열을 파싱한다.
+ * 2. HTTP 상태 값이 200(성공)인 라인의 수를 센다.
+ * 3. 이미지 파일이 호출된 라인 수를 센다. (HTTP 상태와는 상관 없음)
+ *  - 그림 파일은 대소문자 구분 없이 jpg, gif, png 확장자로 끝난다. 단, 디렉토리가 /png/와 같이 포함된 경우도 있다.
+ *  - 파일명 뒤에 ?가 붙는 경우도 고려한다.
+ * 4. access.log 파일은 아래와 같은 형태로 구성되어 있다.
+
+ * [실행결과]
+ * Result Status 200 count : 1274
+ * Image file count : 500
+ * 
+
+from logParsing_sub import logParser
+
+
+inFp = None 
+inList = ""
+
+
+inFp = open("access.log", "r")
+
+inList = inFp.readlines()
+
+success, image = logParser(inList)
+    
+print("Result Status 200 count : {}".format(success))
+print("Image file count : {}".format(image))    
+
+inFp.close()
+
+
+
+이와같은 패턴의 문제에서는 파일의 모든 라인의 구성이 같으므로 파일에서 한 줄만 이용하여
+필요한 로직을 생각해야하는 연습을 하는 것도 좀 더 쉽게 접근할 수 있습니다.
+해당 종합실습 폴더에 logStringTest 파일을 열어보면 data.txt 파일 중 임의의 한 줄을
+이용하여 HTTP 상태값이 위치하는 곳과 이미지 파일이 위치하는 곳을 먼저 알아보았습니다.
+그 위치를 알면 나머지는 각 라인 중 해당 위치(라인의 인덱스)의 값이 조건에서 제시한
+내용과 일치하는지를 비교하면 됩니다.
+
+'''
+def logParser(logList):
+    success = 0
+    images = 0
+
+    
+    for line in logList:
+        tokens = line.split()
+
+        status = tokens[8]
+        
+        if status == '200':
+           success +=1
+
+        url = tokens[6].lower()      
+                 
+        if url.find("?") != -1: #?가 있는지 확인한다. 만약 없으면 -1를 리턴하므로 판단하여
+            url = url[0:url.index("?")]  # -1로 리턴되지 않으면 ?이전 부분까지 잘라낸다.
+               
+
+        if url.endswith(".jpg") or url.endswith(".gif") or url.endswith(".png"):
+            images+=1   
+
+    return success, images  
+    
+    
+    tmp = '64.242.88.10 - - [07/Mar/2004:19:41:33 -0800] "GET /twiki/bin/edit/Main/Header_address_token_limit?topicparent=Main.ConfigurationVariables HTTP/1.1" 401 12846'
+#tmp1='64.242.88.10 - - [07/Mar/2004:19:56:41 -0800] "GET /twiki/bin/rdiff/Main/WebIndex HTTP/1.1" 200 46373'
+tmp1='h24-71-249-14.ca.shawcable.net - - [07/Mar/2004:22:29:13 -0800] "GET /icons/mailman.jpg HTTP/1.1" 200 2022'
+
+
+res = tmp1.split()
+print(res)
+
+
+
+for i in range(len(res)):
+    print("res[%d] = %s"%(i, res[i]))
+    
